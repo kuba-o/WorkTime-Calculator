@@ -1,2 +1,2 @@
-Last fire time:
-Custom vacation days:
+Last fire time:2019-01-17
+Custom vacation days: 5

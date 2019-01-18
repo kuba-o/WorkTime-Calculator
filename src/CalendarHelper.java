@@ -1,4 +1,5 @@
 import java.util.Calendar;
+import java.util.Date;
 
 public class CalendarHelper {
 
@@ -67,7 +68,7 @@ public class CalendarHelper {
         return day;
     }
 
-    public boolean isVacationDay(Calendar date){
+    private boolean isVacationDay(Calendar date){
         return (date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY);
     }
 
@@ -80,5 +81,60 @@ public class CalendarHelper {
             }
             getIterableDay().roll(Calendar.DAY_OF_YEAR, 1);
         }
+    }
+
+    public boolean wasNotRunCurrentMonth(Date lastFireDate){
+        return !wasRunCurrentMonth(lastFireDate);
+    }
+
+    public boolean wasRunCurrentMonth(Date lastFireDate) {
+        try {
+            return validateLastRunTime(lastFireDate);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean validateLastRunTime(Date lastFireDate) throws Exception {
+        boolean yearly = wasRunThisYear(lastFireDate);
+        boolean monthly;
+        if (yearly){
+            monthly = wasRunThisMonth(lastFireDate);
+            return monthly;
+        } return false;
+    }
+
+
+    private int resolveCalendarType(String type) throws Exception {
+        if (Constants.CALENDAR_MONTHLY.equals(type)){
+            return Calendar.MONTH;
+        } else if (Constants.CALENDAR_YEARLY.equals(type)){
+            return Calendar.YEAR;
+        } else {
+            System.out.println(type);
+            throw new Exception("typeResolver cannot resolve value");
+        }
+    }
+
+    private boolean wasRunThisType(Date lastFireTime, int type){
+        Calendar now = Calendar.getInstance();
+        Date nowDate = new Date();
+        now.setTime(nowDate);
+        Calendar lastFireTimeCalendar = Calendar.getInstance();
+        lastFireTimeCalendar.setTime(lastFireTime);
+
+        return now.get(type) <= lastFireTimeCalendar.get(type);
+    }
+
+    private boolean wasRunThisYear(Date lastFireTime) throws Exception {
+        int type = resolveCalendarType(Constants.CALENDAR_YEARLY);
+        return wasRunThisType(lastFireTime, type);
+
+    }
+
+    private boolean wasRunThisMonth(Date lastFireTime) throws Exception {
+        int type = resolveCalendarType(Constants.CALENDAR_MONTHLY);
+        return wasRunThisType(lastFireTime, type);
     }
 }
